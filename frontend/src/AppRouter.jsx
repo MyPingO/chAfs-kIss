@@ -1,13 +1,14 @@
 import { Routes, Route } from "react-router-dom";
 
-import Header from "./components/Header/index";
+import Header from "./components/Header";
+import Home from "./components/Home";
 
 function App() {
   return (
     <>
       <Header />
       <Routes>
-        <Route path="/" element={"home component"} />
+        <Route path="/" element={<Home />} />
         <Route path="/about" element={"about component"} />
         <Route path="/pricing" element={"pricing component"} />
         <Route path="/contact" element={"contact component"} />
