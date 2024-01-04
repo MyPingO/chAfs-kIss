@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 function RecipeSection({ recipeName }) {
   return (
     <div className="card w-full h-full">
-      <div className="card-body bg-base-300 w-full h-full">
+      <div className="card-body bg-base-300 w-full h-full rounded-t-lg">
         <h3 className="card-title">Recipie for Meal {recipeName}</h3>
 
         <h3>Ingredients</h3>
