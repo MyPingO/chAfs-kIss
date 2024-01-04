@@ -5,7 +5,7 @@ import ThemeSwitch from "./ThemeSwitch";
 
 function Header() {
   return (
-    <header className="flex flex-col items-center">
+    <header className="flex flex-col items-center pb-2">
       <div className="flex justify-evenly items-center h-24 font-inter w-3/4">
         <ThemeSwitch />
 
@@ -32,9 +32,6 @@ function Header() {
       </div>
       <div className="text-center">
         <p className="font-inter">Your AI Cooking Assistant</p>
-        <p className="font-bold">
-          Perfect for figuring out what to make for ANY occasion!
-        </p>
       </div>
     </header>
   );
