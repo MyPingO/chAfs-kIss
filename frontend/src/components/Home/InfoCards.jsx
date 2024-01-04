@@ -8,7 +8,10 @@ function InfoCards() {
   return (
     <>
       {titles.map((title, index) => (
-        <div className="card bg-base-300 mb-2 md:w-80 md:mb-0" key={index}>
+        <div
+          className="card bg-base-300 mb-2 md:w-80 md:mb-0 overflow-scroll"
+          key={index}
+        >
           <div className="card-body">
             <h2 className="card-title">{title}</h2>
             <p>

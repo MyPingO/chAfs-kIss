@@ -1,6 +1,6 @@
 function ThemeSwitch() {
   return (
-    <label className="swap swap-rotate absolute left-10">
+    <label className="swap swap-rotate md:absolute md:left-10">
       {/* this hidden checkbox controls the state */}
       <input type="checkbox" className="theme-controller" value="light" />
 
