@@ -19,6 +19,7 @@ function Home() {
         <div className="w-full h-full mr-2">
           <ResponseArea
             responses={responses}
+            badInputs={badInputs}
             setResponses={setResponses}
             setInputView={setInputView}
           />
