@@ -48,8 +48,8 @@ Returns:
         
 """
 @router.post("/generate_recipe")
-async def generate_recipe(recipe_query: RecipeQuery) -> dict[str, list[str]]:
-    recipe_response = get_recipe_for_meal(
+async def generate_recipe(recipe_query: RecipeQuery) -> dict[str, dict[str, list[str]]]:
+    recipe_response = await get_recipe_for_meal(
         meal = recipe_query.meal,
         restrictions=recipe_query.restrictions,
     )

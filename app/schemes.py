@@ -6,7 +6,7 @@ class MealQuery(BaseModel):
         ...,
         example="What's a good high-protein, low-carb meal for a post-workout dinner?",
     )
-    restrictions: list[str] = Field([], example=["peanuts", "Halal", "dairy"])
+    restrictions: list[str] = Field(list[str], example=["peanuts", "Halal", "dairy"])
 
 
 class RecipeQuery(BaseModel):
@@ -14,7 +14,7 @@ class RecipeQuery(BaseModel):
         ...,
         example="Pizza",
     )
-    restrictions: list[str] = Field([], example=["White Flour"])
+    restrictions: list[str] = Field(list[str], example=["White Flour"])
 
 
 class FollowUpQuery(BaseModel):

@@ -12,14 +12,16 @@ function ResponseArea({ setInputView, responses, setResponses, badInputs }) {
 
     const server_url = "https://07wljc9s-8000.use.devtunnels.ms";
     // Hardcoded meal query data
-    const mealQueryData = {
-      query: foodInput.value,
-      restrictions: restrictions,
-    };
 
     const data = fetch(`${server_url}/generate_meals`, {
       method: "POST",
-      body: mealQueryData,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: foodInput.value,
+        restrictions: restrictions,
+      }),
     });
     try {
       const res = await data;
