@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-function ResponseList({ responses, setInputView }) {
+function ResponseList({ responses, setInputView, setRecipeIndex }) {
   return (
     <div>
       {/* eslint-disable-next-line react/no-unescaped-entities */}
@@ -14,6 +14,7 @@ function ResponseList({ responses, setInputView }) {
               className="btn max-w-32 w-full sm:btn-lg"
               onClick={() => {
                 setInputView(false);
+                setRecipeIndex(index);
               }}
             >
               {response}
@@ -28,6 +29,7 @@ function ResponseList({ responses, setInputView }) {
 ResponseList.propTypes = {
   responses: PropTypes.array.isRequired,
   setInputView: PropTypes.func.isRequired,
+  setRecipeIndex: PropTypes.func.isRequired,
 };
 
 export default ResponseList;

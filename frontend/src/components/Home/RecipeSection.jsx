@@ -1,25 +1,43 @@
 import PropTypes from "prop-types";
 
-function RecipeSection({ recipeName }) {
+function RecipeSection({ recipeName, ingredients, instructions }) {
   return (
     <div className="card w-full h-full">
       <div className="card-body bg-base-300 w-full h-full rounded-t-lg">
-        <h3 className="card-title">Recipie for Meal {recipeName}</h3>
+        <h3 className="card-title">Recipie for: {recipeName}</h3>
 
         <h3>Ingredients</h3>
         <ul>
-          {/* pretend theres a loop here to load in elems from an arr */}
-          <li>list 1</li>
-          <li>list 2</li>
-          <li>list 3</li>
+          {ingredients !== undefined ? (
+            ingredients.map((ingredient, index) => (
+              <li key={index}>{ingredient}</li>
+            ))
+          ) : (
+            <>
+              <li className="skeleton h-5 w-full"></li>
+              <div className="divider mt-0"></div>
+              <li className="skeleton h-5 w-full"></li>
+              <div className="divider mt-0"></div>
+              <li className="skeleton h-5 w-full"></li>
+            </>
+          )}
         </ul>
 
         <h3>Recipe</h3>
         <ul>
-          {/* pretend theres a loop here to load in elems from an arr */}
-          <li>list 1</li>
-          <li>list 2</li>
-          <li>list 3</li>
+          {instructions !== undefined ? (
+            instructions.map((instruction, index) => (
+              <li key={index}>{instruction}</li>
+            ))
+          ) : (
+            <>
+              <li className="skeleton h-5 w-full"></li>
+              <div className="divider mt-0"></div>
+              <li className="skeleton h-5 w-full"></li>
+              <div className="divider mt-0"></div>
+              <li className="skeleton h-5 w-full"></li>
+            </>
+          )}
         </ul>
       </div>
     </div>
@@ -28,6 +46,8 @@ function RecipeSection({ recipeName }) {
 
 RecipeSection.propTypes = {
   recipeName: PropTypes.string.isRequired,
+  ingredients: PropTypes.array,
+  instructions: PropTypes.array,
 };
 
 export default RecipeSection;

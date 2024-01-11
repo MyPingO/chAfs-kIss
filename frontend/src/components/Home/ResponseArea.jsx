@@ -1,15 +1,30 @@
 import ResponseList from "./ResponseList";
 import PropTypes from "prop-types";
 
-function ResponseArea({ setInputView, responses, setResponses, badInputs }) {
+function ResponseArea({
+  setRecipeIndex,
+  setRecipes,
+  setInputView,
+  responses,
+  setResponses,
+  badInputs,
+}) {
   async function handleSubmit() {
     const foodInput = document.getElementById("food-input");
     const restrictions = [...badInputs];
 
-    setResponses(["loading"]);
     if (foodInput.value === "") return;
     foodInput.disabled = true;
+    setResponses(["loading"]);
 
+    setResponses([
+      "Sesame Chicken",
+      "Chicken Lo Mein",
+      "Shrimp Fried Rice",
+      "Hot and Sour Soup",
+    ]);
+
+    /*
     const server_url = "https://07wljc9s-8000.use.devtunnels.ms";
     // Hardcoded meal query data
     const mealQueryData = {
@@ -29,12 +44,7 @@ function ResponseArea({ setInputView, responses, setResponses, badInputs }) {
     } catch (err) {
       console.log(err, data);
     }
-    // setResponses([
-    //   "Sesame Chicken",
-    //   "Chicken Lo Mein",
-    //   "Shrimp Fried Rice",
-    //   "Hot and Sour Soup",
-    // ]);
+    */
   }
   return (
     <div className="join join-vertical w-full h-full">
@@ -50,7 +60,12 @@ function ResponseArea({ setInputView, responses, setResponses, badInputs }) {
           <button
             className="btn btn-error rounded-none rounded-tr-lg text-white"
             onClick={() => {
-              location.reload();
+              const foodInput = document.getElementById("food-input");
+              foodInput.disabled = false;
+              foodInput.value = "";
+              setResponses([]);
+              setRecipeIndex(null);
+              setRecipes([{}, {}, {}, {}]);
             }}
           >
             Reset
@@ -73,7 +88,11 @@ function ResponseArea({ setInputView, responses, setResponses, badInputs }) {
             </div>
           </>
         ) : (
-          <ResponseList responses={responses} setInputView={setInputView} />
+          <ResponseList
+            responses={responses}
+            setInputView={setInputView}
+            setRecipeIndex={setRecipeIndex}
+          />
         )}
       </div>
     </div>
@@ -85,6 +104,8 @@ ResponseArea.propTypes = {
   responses: PropTypes.array.isRequired,
   setResponses: PropTypes.func.isRequired,
   badInputs: PropTypes.object.isRequired,
+  setRecipeIndex: PropTypes.func.isRequired,
+  setRecipes: PropTypes.func.isRequired,
 };
 
 export default ResponseArea;
