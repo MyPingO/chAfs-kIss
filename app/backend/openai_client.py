@@ -108,6 +108,7 @@ Instructions:
 
 def extract_recipe_sections(recipe: str) -> dict[str, list[str]]:
     # Using regular expressions to extract ingredients and instructions
+    # Split at "Instructions" as that is the halfway point
     ingredients_list = re.findall(r'\n\d+\.\s+([^\n]+)', recipe.split("Instructions")[0])
     instructions_list = re.findall(r'\n\d+\.\s+([^\n]+)', recipe.split("Instructions")[1])
 

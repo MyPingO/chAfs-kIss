@@ -1,9 +1,9 @@
 from schemes import *
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
-from .edamam import get_recipe_nutrition
 from fastapi import APIRouter, Depends, HTTPException
 from .login_manager import hash_password, verify_password
+from .edamam import get_recipe_nutrition, filter_nutrition_data
 from .openai_client import get_meal_response, get_recipe_for_meal
 
 router = APIRouter()
@@ -61,6 +61,8 @@ async def generate_recipe_report(recipe_query: RecipeQuery) -> dict:
         recipe_nutrition = await get_recipe_nutrition(
             ingredients=recipe_response["ingredients"],
         )
+        recipe_nutrition = filter_nutrition_data(recipe_nutrition)
+        
     except HTTPException as e:
         print(f"HTTPException: {e.detail}")
         recipe_nutrition = None
