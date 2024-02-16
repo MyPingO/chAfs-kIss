@@ -1,10 +1,7 @@
 import os
+import re
 import openai
 from openai import AsyncOpenAI
-from dotenv import load_dotenv
-import re
-
-load_dotenv()
 
 # get API key env file
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -46,12 +43,13 @@ async def get_meal_response(query: str, restrictions: list[str] = None) -> list[
 async def get_recipe_for_meal(
     meal: str, restrictions: list[str] = None
 ) -> dict[str, list[str]]:
-    instructions = "You create recipes for a given meal, adhering strictly to any restrictions or assuming none if unspecified. Specify ingredients first, then instructions. Respond succinctly and number responses."
+    instructions = "You create recipes for a given meal, adhering strictly to any restrictions or assuming none if unspecified. Specify ingredients first, then instructions. Respond succinctly and number responses. Optional ingredients must start with \"Optional: \""
     restrictions_str = str.join(", ", restrictions)
     query = f"Generate a concise recipe for {meal}." + (
         f" User specified restrictions: {restrictions_str if restrictions_str else 'None'}"
     )
 
+    # API Call
     # response = await client.chat.completions.create(
     #     model="gpt-4",
     #     messages=[
@@ -72,7 +70,7 @@ Ingredients:
 6. 1 Tablespoon of Olive Oil
 7. 1/2 Cup of Tomato Sauce
 8. 1.5 Cups of Shredded Mozzarella Cheese
-9. Toppings of Choice (Eg. Sliced Bell Peppers, Mushrooms, Olives, Pepperoni)
+9. Optional: Toppings of Choice (Eg. Sliced Bell Peppers, Mushrooms, Olives, Pepperoni)
 
 Instructions:
 
@@ -103,25 +101,18 @@ Instructions:
 
     # print(response.choices[0].message.content)
     print(response)
+    
+    # filtered_response = extract_recipe_sections(response.choices[0].message.content)
+    filtered_response = extract_recipe_sections(response)
+    return filtered_response
 
-    # Split the response into ingredients and instructions
-    split_pattern = r"(?i)instructions\s*:?"
-    split_response = re.split(
-        split_pattern, response, maxsplit=1
-    )
-    ingredients_list = split_response[0].split("\n")
-    instructions_list = split_response[1].split("\n")
-
-    # Clean up the ingredients: strip whitespace and filter out uneeded strings
-    ingredients_list = [
-        ingredient.strip() for ingredient in ingredients_list if ingredient.strip() and ingredient[0].isnumeric()
-    ]
-    instructions_list = [
-        instruction.strip() for instruction in instructions_list if instruction.strip() and instruction[0].isnumeric()
-    ]
+def extract_recipe_sections(recipe: str) -> dict[str, list[str]]:
+    # Using regular expressions to extract ingredients and instructions
+    # Split at "Instructions" as that is the halfway point
+    ingredients_list = re.findall(r'\n\d+\.\s+([^\n]+)', recipe.split("Instructions")[0])
+    instructions_list = re.findall(r'\n\d+\.\s+([^\n]+)', recipe.split("Instructions")[1])
 
     return {"ingredients": ingredients_list, "instructions": instructions_list}
-
 
 # Example usage:
 # meal_suggestions = get_meal_response("I'm looking for vegetarian dinner options.")
