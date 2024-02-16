@@ -1,17 +1,12 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "../../utils/firebaseInit";
+import { addUserToFirestore, auth } from "../../utils/firebaseInit";
 export default function Login() {
   async function handleLogin() {
     const provider = new GoogleAuthProvider();
 
     try {
-      const userCredential = await signInWithPopup(auth, provider);
-      const lastSignIn = userCredential.user.metadata.lastSignInTime;
-      const creationTime = userCredential.user.metadata.creationTime;
-
-      if (lastSignIn === creationTime) {
-        // TODO: Add func to create userdoc in firestore on first time login
-      }
+      await signInWithPopup(auth, provider);
+      await addUserToFirestore();
       window.location = "/";
     } catch (err) {
       console.error(err);
