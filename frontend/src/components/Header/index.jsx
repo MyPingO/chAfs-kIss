@@ -20,8 +20,8 @@ function Header() {
           <Link to={"/contact"} className="">
             Contact
           </Link>
-          <Link to={"/terms"} className="">
-            Terms
+          <Link to={"/signout"} className="">
+            Sign Out
           </Link>
 
           <ThemeSwitch />
@@ -51,12 +51,6 @@ function Header() {
               </Link>
             </li>
             <li>
-              {" "}
-              <Link to={"/terms"} className="">
-                Terms
-              </Link>
-            </li>
-            <li>
               <Link to={"/pricing"}>🛒 Balance: X </Link>
             </li>
             <li>
@@ -67,6 +61,9 @@ function Header() {
                 id="theme-control-md"
               />
               <label htmlFor="theme-control-md">🎨 Switch Theme</label>
+            </li>
+            <li>
+              <Link to={"/signout"}>❌ Sign Out </Link>
             </li>
           </ul>
         </details>

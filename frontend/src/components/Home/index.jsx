@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import BadInputs from "./BadInputs";
 import ResponseArea from "./ResponseArea";
 import RecipeSection from "./RecipeSection";
 import InfoCards from "./InfoCards";
+
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../utils/firebaseInit";
 
 function Home() {
   const [inputView, setInputView] = useState(true); // by default true
@@ -12,6 +15,27 @@ function Home() {
 
   const [recipes, setRecipes] = useState([{}, {}, {}, {}]);
   const [recipeIndex, setRecipeIndex] = useState(null); // a number 0-3
+
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async user => {
+      if (user) {
+        setLoggedIn(true);
+      } else {
+        window.location = "/login";
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (!loggedIn) {
+    return (
+      <div className="flex h-5/6 justify-center">
+        <div className="loading loading-spinner w-28 md:w-32"></div>
+      </div>
+    );
+  }
 
   if (inputView) {
     return (
