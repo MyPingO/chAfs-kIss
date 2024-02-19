@@ -28,6 +28,10 @@ class StripeCheckoutSession(BaseModel):
         ...,
         example=10,
     )
+    user_id: str = Field(
+        ...,
+        example="1234567890",
+    )
 
 
 class Token(BaseModel):
