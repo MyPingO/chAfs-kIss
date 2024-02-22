@@ -18,14 +18,6 @@ function ResponseArea({
     if (foodInput.value === "") return;
     foodInput.disabled = true;
     setResponses(["loading"]);
-
-    // setResponses([
-    //   "Sesame Chicken",
-    //   "Chicken Lo Mein",
-    //   "Shrimp Fried Rice",
-    //   "Hot and Sour Soup",
-    // ]);
-
     const server_url = import.meta.env.VITE_SERVER_URL;
 
     const data = fetch(`${server_url}/generate_meals`, {
@@ -42,9 +34,14 @@ function ResponseArea({
     try {
       const res = await data;
       const resData = await res.json();
-      setResponses(resData.response);
+      if (resData.detail) {
+        throw new Error(resData.detail);
+      } else {
+        setResponses(resData.response);
+      }
     } catch (err) {
       console.log(err);
+      window.alert(`An error occured: \n${err}`);
     }
   }
   return (
@@ -61,7 +58,7 @@ function ResponseArea({
               }}
               placeholder="What would you like to eat?"
               id="food-input"
-              maxLength="351"
+              maxLength="350"
               onInput={e => {
                 const newInputLength = e.target.value.length;
                 const input = e.target;
