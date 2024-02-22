@@ -1,0 +1,26 @@
+{
+  "success": [
+    "Congratulations on your purchase of plates! Get ready to elevate your dining experience.",
+    "Success! You've added plates to your collection, perfect for hosting memorable meals.",
+    "Your purchase of plates is confirmed! Prepare to serve your favorite dishes in style.",
+    "Well done! You've just upgraded your kitchen with new plates for any occasion.",
+    "Success! Your order for plates is complete. Time to set the table and enjoy.",
+    "Great choice! Your purchase of plates is a step towards creating beautiful table settings.",
+    "Success! You're now equipped with quality plates for everyday use or special gatherings.",
+    "Congratulations on your purchase! These plates will surely add elegance to your dining table.",
+    "Your order for plates is successful! Enhance your dining experience with these essential pieces.",
+    "Success! You've secured your set of plates, ready to serve up delicious meals with style."
+  ],
+  "error": [
+    "Oops! It seems there was an issue processing your purchase of plates. Please try again later.",
+    "Error: Your transaction for plates could not be completed. Please check your payment information and try again.",
+    "We're sorry, but there was a problem with your purchase request for plates. Please contact customer support for assistance.",
+    "Purchase failed! It appears there was a technical error while processing your order for plates. Please refresh the page and try again.",
+    "Uh-oh! Your attempt to purchase plates was unsuccessful. Please verify your shipping address and payment details.",
+    "Error: The purchase of plates encountered a problem. Please ensure you have sufficient funds in your account and try again.",
+    "We apologize, but we're unable to fulfill your purchase of plates at this time. Please check your internet connection and try again later.",
+    "Purchase unsuccessful! It seems there was an issue on our end while processing your order for plates. Please try again in a few moments.",
+    "Sorry, there was an error processing your request to purchase plates. Please review your order and try again.",
+    "Error: We couldn't complete your purchase of plates due to a system error. Please try again later or contact support for assistance."
+  ]
+}
