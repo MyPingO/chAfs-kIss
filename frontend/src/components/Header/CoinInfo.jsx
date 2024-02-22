@@ -1,4 +1,6 @@
-function CoinInfo() {
+import PropTypes from "prop-types";
+
+function CoinInfo({ coinCount }) {
   return (
     <div className="join absolute right-10">
       <div className="join-item bg-accent flex item-center">
@@ -8,11 +10,18 @@ function CoinInfo() {
         className="join-item input input-md text-end w-14 overflow-scroll flex items-center justify-center p-0"
         disabled
       >
-        ###
-        {/* pull this from db */}
+        {coinCount < 0 ? (
+          <span className="loading loading-spinner loading-xs"></span>
+        ) : (
+          coinCount
+        )}
       </span>
     </div>
   );
 }
+
+CoinInfo.propTypes = {
+  coinCount: PropTypes.number.isRequired,
+};
 
 export default CoinInfo;

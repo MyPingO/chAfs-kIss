@@ -3,7 +3,26 @@ import { Link } from "react-router-dom";
 import CoinInfo from "./CoinInfo";
 import ThemeSwitch from "./ThemeSwitch";
 
+import { useEffect, useState } from "react";
+import { isUserSignedIn } from "../../utils/firebase/isSignedIn";
+import { getCoinCount } from "../../utils/firebase/getCoinCount";
+
 function Header() {
+  const [coinCount, setCoinCount] = useState(-1);
+  useEffect(() => {
+    async function handleLoad() {
+      const signedIn = await isUserSignedIn();
+      console.log(signedIn, "this is signed in");
+      if (signedIn) {
+        const coins = await getCoinCount();
+        setCoinCount(coins);
+      } else {
+        console.log("user wasnt signed in");
+      }
+    }
+
+    handleLoad();
+  }, []);
   return (
     <>
       <header className="hidden flex-col items-center pb-2 md:flex">
@@ -25,7 +44,7 @@ function Header() {
           </Link>
 
           <ThemeSwitch />
-          <CoinInfo />
+          <CoinInfo coinCount={coinCount} />
         </div>
         <div className="text-center">
           <p className="font-inter">Your AI Cooking Assistant</p>
@@ -51,7 +70,14 @@ function Header() {
               </Link>
             </li>
             <li>
-              <Link to={"/pricing"}>🛒 Balance: X </Link>
+              <Link to={"/pricing"}>
+                🛒 Balance:{" "}
+                {coinCount < 0 ? (
+                  <span className="loading loading-spinner loading-xs"></span>
+                ) : (
+                  coinCount
+                )}{" "}
+              </Link>
             </li>
             <li>
               <input

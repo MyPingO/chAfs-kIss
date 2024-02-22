@@ -32,4 +32,4 @@ async function addUserToFirestore() {
   }
 }
 
-export { auth, addUserToFirestore };
+export { auth, db, addUserToFirestore };
