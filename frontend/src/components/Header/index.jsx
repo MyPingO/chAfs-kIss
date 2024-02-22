@@ -9,10 +9,11 @@ import { getCoinCount } from "../../utils/firebase/getCoinCount";
 
 function Header() {
   const [coinCount, setCoinCount] = useState(-1);
+  const [isSignedIn, setIsSignedIn] = useState(false);
   useEffect(() => {
     async function handleLoad() {
       const signedIn = await isUserSignedIn();
-      console.log(signedIn, "this is signed in");
+      setIsSignedIn(signedIn);
       if (signedIn) {
         const coins = await getCoinCount();
         setCoinCount(coins);
@@ -44,7 +45,7 @@ function Header() {
           </Link>
 
           <ThemeSwitch />
-          <CoinInfo coinCount={coinCount} />
+          {isSignedIn ? <CoinInfo coinCount={coinCount} /> : ""}
         </div>
         <div className="text-center">
           <p className="font-inter">Your AI Cooking Assistant</p>
@@ -69,16 +70,20 @@ function Header() {
                 Contact
               </Link>
             </li>
-            <li>
-              <Link to={"/pricing"}>
-                🛒 Balance:{" "}
-                {coinCount < 0 ? (
-                  <span className="loading loading-spinner loading-xs"></span>
-                ) : (
-                  coinCount
-                )}{" "}
-              </Link>
-            </li>
+            {isSignedIn ? (
+              <li>
+                <Link to={"/pricing"}>
+                  🛒 Balance:{" "}
+                  {coinCount < 0 ? (
+                    <span className="loading loading-spinner loading-xs"></span>
+                  ) : (
+                    coinCount
+                  )}{" "}
+                </Link>
+              </li>
+            ) : (
+              ""
+            )}
             <li>
               <input
                 type="checkbox"
