@@ -1,16 +1,19 @@
 import { auth } from "./firebaseInit";
 
-export async function stripeCheckout(server_url, stripePromise) {
-  const response = await fetch(`${server_url}/create-stripe-checkout`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+export async function stripeCheckout(stripePromise) {
+  const response = await fetch(
+    `${import.meta.env.VITE_SERVER_URL}/create-stripe-checkout`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        quantity: 5,
+        user_id: auth.currentUser.uid,
+      }),
     },
-    body: JSON.stringify({
-      quantity: 5,
-      user_id: auth.currentUser.uid,
-    }),
-  });
+  );
   const data = await response.json();
 
   const stripe = await stripePromise;

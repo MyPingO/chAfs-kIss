@@ -1,8 +1,9 @@
 import PropTypes from "prop-types";
+import { stripeCheckout } from "../../utils/stripeCheckout";
 
-export default function CoinCard({ price, amount, description, url }) {
+export default function CoinCard({ price, amount, description, url, stripe }) {
   return (
-    <div className="card card-compact w-64 bg-base-100 shadow-xl">
+    <div className="card w-60 sm:w-72 md:w-80 lg:w-[25rem] bg-base-200 overflow-scroll h-min">
       <figure>
         <img
           src="https://daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg"
@@ -10,10 +11,19 @@ export default function CoinCard({ price, amount, description, url }) {
         />
       </figure>
       <div className="card-body">
-        <h2 className="card-title">{amount} plates</h2>
-        <p>If a dog chews shoes whose shoes does he choose?</p>
+        <h2 className="card-title text-lg md:text-xl">
+          {amount} plates [{price} dollars]
+        </h2>
+        <p>{description}</p>
         <div className="card-actions justify-end">
-          <button className="btn btn-primary">Buy Now</button>
+          <button
+            onClick={() => {
+              stripeCheckout(stripe);
+            }}
+            className="btn btn-primary"
+          >
+            Buy Now
+          </button>
         </div>
       </div>
     </div>
@@ -25,4 +35,5 @@ CoinCard.propTypes = {
   amount: PropTypes.number.isRequired,
   description: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
+  stripe: PropTypes.object.isRequired,
 };

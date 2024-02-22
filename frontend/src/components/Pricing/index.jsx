@@ -1,11 +1,11 @@
 import { loadStripe } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
 import CoinCard from "./CoinCard";
-import { stripeCheckout } from "../../utils/stripeCheckout";
 
 export default function Pricing() {
   const [stripe, setStripe] = useState(null);
   const prices = [5, 10, 15];
+  const descriptions = ["for one", "for two", "for three"];
 
   useEffect(() => {
     async function fetchStripe() {
@@ -24,23 +24,16 @@ export default function Pricing() {
           <div className="loading loading-spinner w-28 md:w-32"></div>
         </div>
       ) : (
-        <div className="flex flex-row">
+        <div className="flex justify-evenly items-center flex-wrap gap-4 h-3/4">
           {prices.map((value, index) => (
             <CoinCard
               price={value}
-              amount={index}
-              description={"asdf "}
+              amount={index + 1}
+              description={descriptions[index]}
+              stripe={stripe}
               key={index}
             />
           ))}
-          <button
-            onClick={() => {
-              stripeCheckout(import.meta.env.VITE_SERVER_URL, stripe);
-            }}
-            className="btn btn-secondary"
-          >
-            go to checkout
-          </button>
         </div>
       )}
     </>
