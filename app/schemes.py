@@ -23,6 +23,12 @@ class FollowUpQuery(BaseModel):
         example="What's a good side dish to complement this meal?",
     )
     
+class Login(BaseModel):
+    token: str = Field(
+        ...,
+        example="1234567890",
+    )
+    
 class StripeCheckoutSession(BaseModel):
     quantity: int = Field(
         ...,

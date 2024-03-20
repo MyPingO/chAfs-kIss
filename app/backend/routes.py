@@ -2,6 +2,7 @@ import os
 import stripe
 from schemes import *
 from .firebase import db
+from firebase_admin import auth
 from fastapi import APIRouter, HTTPException, Request
 from .edamam import get_recipe_nutrition, filter_nutrition_data
 from .openai_client import get_meal_response, get_recipe_for_meal
@@ -25,11 +26,14 @@ stripe_webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET")
 
 """
 
-
+query_max_length = 350
 @router.post("/generate_meals")
 async def generate_meals(meal_query: MealQuery) -> dict[str, list[str]]:
+    query = meal_query.query
+    if (len(query) > query_max_length):
+        raise HTTPException(status_code=400, detail="Query length must be less than 350 characters")
     meal_response = await get_meal_response(
-        query=meal_query.query,
+        query=query,
         restrictions=meal_query.restrictions,
     )
 
@@ -71,6 +75,20 @@ async def generate_recipe_report(recipe_query: RecipeQuery) -> dict:
 
     return {"recipe": recipe_response, "nutrition": recipe_nutrition}
 
+@router.post("/login")
+async def login(login: Login):
+    token = login.token
+    try:
+        decoded_token = auth.verify_id_token(token)
+        user_id = decoded_token['uid']
+        user_ref = db.collection('users').document(user_id)
+        doc = user_ref.get()
+        # Add user to Firestore if they don't exist
+        if not doc.exists:
+            user_ref.set({'coin_count': 0})
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/create-stripe-checkout")
 async def create_stripe_checkout(StripeCheckoutSession: StripeCheckoutSession):
@@ -116,10 +134,10 @@ async def stripe_webhook(request: Request):
 
     except ValueError as e:
         # Invalid payload
-        return HTTPException(status_code=400, detail='Invalid payload')
+        raise HTTPException(status_code=400, detail='Invalid payload')
     except stripe.error.SignatureVerificationError as e:
         # Invalid signature
-        return HTTPException(status_code=400, detail='Invalid signature')
+        raise HTTPException(status_code=400, detail='Invalid signature')
 
     # Handle the checkout.session.completed event
     if event['type'] == 'checkout.session.completed':
@@ -128,7 +146,7 @@ async def stripe_webhook(request: Request):
         # Extract user_id and quantity from the session's metadata
         user_id = session['metadata']['user_id'] if 'user_id' in session['metadata'] else None
         if not user_id:
-            return HTTPException(status_code=400, detail='User ID not found')
+            raise HTTPException(status_code=400, detail='User ID not found')
         quantity = int(session['metadata']['quantity'])
 
         # Update the user's coin_count in Firestore
@@ -147,5 +165,5 @@ async def update_user_coin_count(user_id: str, quantity: int):
         new_coin_count = current_coins + quantity
         user_ref.update({'coin_count': new_coin_count})
     else:
-        return HTTPException(status_code=404, detail='User not found')
+        raise HTTPException(status_code=404, detail='User not found')
 

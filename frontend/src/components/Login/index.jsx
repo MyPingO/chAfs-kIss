@@ -1,15 +1,32 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { addUserToFirestore, auth } from "../../utils/firebaseInit";
+import { auth } from "../../utils/firebaseInit";
 export default function Login() {
   async function handleLogin() {
     const provider = new GoogleAuthProvider();
-
     try {
-      await signInWithPopup(auth, provider);
-      await addUserToFirestore();
-      window.location = "/";
-    } catch (err) {
-      console.error(err);
+      await signInWithPopup(auth, provider)
+        .then((result) => {
+          const user = result.user;
+          user.getIdToken()
+            .then((token) => {
+              fetch("http://localhost:8000/login", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ token }),
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  console.log(data);
+                })
+                .catch((err) => console.error(err));
+            });
+        });
+        window.location = "/";
+    }
+    catch (error) {
+      console.error("Error signing in with Google:", error);
     }
   }
   return (
