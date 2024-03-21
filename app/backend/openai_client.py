@@ -13,22 +13,24 @@ async def get_meal_response(query: str, restrictions: list[str] = None) -> list[
     instructions = "Suggest 4 meals per user input, adhering strictly to any restrictions or assuming none if unspecified. Respond succinctly names and number responses."
     restrictions_str = str.join(", ", restrictions)
 
-    response = await client.chat.completions.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": instructions},
-            {
-                "role": "user",
-                "content": query
-                + (
-                    f" User specified restrictions: {restrictions_str if restrictions_str else 'None'}"
-                ),
-            },
-        ],
-        max_tokens=50,
-    )
-    response_text = response.choices[0].message.content
-    print(response_text)
+    # response = await client.chat.completions.create(
+    #     model="gpt-4",
+    #     messages=[
+    #         {"role": "system", "content": instructions},
+    #         {
+    #             "role": "user",
+    #             "content": query
+    #             + (
+    #                 f" User specified restrictions: {restrictions_str if restrictions_str else 'None'}"
+    #             ),
+    #         },
+    #     ],
+    #     max_tokens=50,
+    # )
+    # response_text = response.choices[0].message.content
+    # print(response_text)
+
+    response_text = "1. Grilled Salmon fillet with Lemon Dill Sauce\n2. Caprese Stuffed Balsamic Chicken\n3. Vegan Thai Green Curry\n4. Classic Beef Lasagna"
     # Remove newline characters and extra spaces
     response_text = response_text.replace("\n", " ").strip()
     # Split the response using regex to separate each meal
@@ -43,7 +45,7 @@ async def get_meal_response(query: str, restrictions: list[str] = None) -> list[
 async def get_recipe_for_meal(
     meal: str, restrictions: list[str] = None
 ) -> dict[str, list[str]]:
-    instructions = "You create recipes for a given meal, adhering strictly to any restrictions or assuming none if unspecified. Specify ingredients first, then instructions. Respond succinctly and number responses. Optional ingredients must start with \"Optional: \""
+    instructions = 'You create recipes for a given meal, adhering strictly to any restrictions or assuming none if unspecified. Specify ingredients first, then instructions. Respond succinctly and number responses. Optional ingredients must start with "Optional: "'
     restrictions_str = str.join(", ", restrictions)
     query = f"Generate a concise recipe for {meal}." + (
         f" User specified restrictions: {restrictions_str if restrictions_str else 'None'}"
@@ -101,18 +103,24 @@ Instructions:
 
     # print(response.choices[0].message.content)
     print(response)
-    
+
     # filtered_response = extract_recipe_sections(response.choices[0].message.content)
     filtered_response = extract_recipe_sections(response)
     return filtered_response
 
+
 def extract_recipe_sections(recipe: str) -> dict[str, list[str]]:
     # Using regular expressions to extract ingredients and instructions
     # Split at "Instructions" as that is the halfway point
-    ingredients_list = re.findall(r'\n\d+\.\s+([^\n]+)', recipe.split("Instructions")[0])
-    instructions_list = re.findall(r'\n\d+\.\s+([^\n]+)', recipe.split("Instructions")[1])
+    ingredients_list = re.findall(
+        r"\n\d+\.\s+([^\n]+)", recipe.split("Instructions")[0]
+    )
+    instructions_list = re.findall(
+        r"\n\d+\.\s+([^\n]+)", recipe.split("Instructions")[1]
+    )
 
     return {"ingredients": ingredients_list, "instructions": instructions_list}
+
 
 # Example usage:
 # meal_suggestions = get_meal_response("I'm looking for vegetarian dinner options.")

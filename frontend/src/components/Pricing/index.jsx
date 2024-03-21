@@ -10,7 +10,7 @@ export default function Pricing() {
   useEffect(() => {
     async function fetchStripe() {
       const stripeInstance = await loadStripe(
-        "pk_live_51Nb7wcDBTPrDBCweZcQaokr0DACDm5ZG1YLE9f1HpM3q2yFE3ObkVxIXOSyIQyvKU9edGgk7tZvX7qsqNQr9r5Zw00xEDZyYrk",
+        "pk_test_51Nb7wcDBTPrDBCwewvTcqwhi1AaQuaaDSLFLa5O0KnNfQbUiVpAdRBX4pHKGNyhE4ZA12V1Vmx1WkrZhtPbJSFq800tuRywYko",
       );
       setStripe(stripeInstance);
     }
