@@ -7,6 +7,7 @@ import InfoCards from "./InfoCards";
 
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../utils/firebaseInit";
+import { getUnusedMeals } from "../../utils/firebase/getUnusedMeals";
 
 function Home() {
   const [inputView, setInputView] = useState(true); // by default true
@@ -21,6 +22,9 @@ function Home() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async user => {
       if (user) {
+        const meals = await getUnusedMeals();
+        setResponses(meals);
+
         setLoggedIn(true);
       } else {
         window.location = "/login";

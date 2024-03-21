@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { auth } from "../../utils/firebaseInit";
 import ResponseList from "./ResponseList";
 import PropTypes from "prop-types";
 
@@ -14,6 +15,7 @@ function ResponseArea({
   async function handleSubmit() {
     const foodInput = document.getElementById("food-input");
     const restrictions = [...badInputs];
+    const idToken = await auth.currentUser.getIdToken();
 
     if (foodInput.value === "") return;
     foodInput.disabled = true;
@@ -24,6 +26,7 @@ function ResponseArea({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: idToken,
       },
       body: JSON.stringify({
         query: foodInput.value,

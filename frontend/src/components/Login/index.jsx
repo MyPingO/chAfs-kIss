@@ -4,28 +4,26 @@ export default function Login() {
   async function handleLogin() {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider)
-        .then((result) => {
-          const user = result.user;
-          user.getIdToken()
-            .then((token) => {
-              fetch("http://localhost:8000/login", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ token }),
-              })
-                .then((res) => res.json())
-                .then((data) => {
-                  console.log(data);
-                })
-                .catch((err) => console.error(err));
-            });
+      await signInWithPopup(auth, provider).then(result => {
+        const user = result.user;
+        user.getIdToken().then(token => {
+          const server_url = import.meta.env.VITE_SERVER_URL;
+          fetch(`${server_url}/login`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ token }),
+          })
+            .then(res => res.json())
+            .then(data => {
+              console.log(data);
+            })
+            .catch(err => console.error(err));
         });
-        window.location = "/";
-    }
-    catch (error) {
+      });
+      window.location = "/";
+    } catch (error) {
       console.error("Error signing in with Google:", error);
     }
   }
