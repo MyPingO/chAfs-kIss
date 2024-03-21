@@ -1,9 +1,9 @@
 import os
 import stripe
 from schemes import *
-from .firebase import db
 from firebase_admin import auth
-from fastapi import APIRouter, HTTPException, Request
+from .firebase import db, get_login_uid
+from fastapi import APIRouter, HTTPException, Request, Depends
 from .edamam import get_recipe_nutrition, filter_nutrition_data
 from .openai_client import get_meal_response, get_recipe_for_meal
 
@@ -12,6 +12,7 @@ stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
 stripe_webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET")
 
 # --Routes-- #
+
 
 """
  Returns a filtered response from the OpenAI API for a given MealQuery
@@ -26,17 +27,32 @@ stripe_webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET")
 
 """
 
+
 query_max_length = 350
-@router.post("/generate_meals")
-async def generate_meals(meal_query: MealQuery) -> dict[str, list[str]]:
+@router.post("/generate_meals") # TODO: Check for coin count, set unused_meals in db
+async def generate_meals(meal_query: MealQuery, uid: str = Depends(get_login_uid)) -> dict[str, list[str]]:
+    # Get coin count from Firestore
+    doc = db.collection('users').document(uid).get()
+    coin_count = doc.to_dict().get('coin_count', 0)
+    if coin_count < 1:
+        raise HTTPException(status_code=402, detail="Insufficient plates to generate meals. Please purchase more.")
+    
     query = meal_query.query
     if (len(query) > query_max_length):
         raise HTTPException(status_code=400, detail="Query length must be less than 350 characters")
+    
     meal_response = await get_meal_response(
         query=query,
         restrictions=meal_query.restrictions,
     )
+    
+    # Update coin count and unused_meals in Firestore
+    db.collection('users').document(uid).update({
+        'coin_count': coin_count - 1,
+        'unused_meals': meal_response
+    })
 
+    
     return {"response": meal_response}
 
 
@@ -56,11 +72,14 @@ Returns:
         
 """
 
-
 @router.post("/generate_recipe_report")
 async def generate_recipe_report(recipe_query: RecipeQuery) -> dict:
+    meal = recipe_query.meal
+    # Check if meal is in unused_meals in db
+
+    
     recipe_response = await get_recipe_for_meal(
-        meal=recipe_query.meal,
+        meal=meal,
         restrictions=recipe_query.restrictions,
     )
     try:
@@ -86,9 +105,11 @@ async def login(login: Login):
         # Add user to Firestore if they don't exist
         if not doc.exists:
             user_ref.set({'coin_count': 0})
+            user_ref.set({'unused_meals': []}) # list of strings
         return {"status": "success"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    
 
 @router.post("/create-stripe-checkout")
 async def create_stripe_checkout(StripeCheckoutSession: StripeCheckoutSession):
@@ -102,7 +123,7 @@ async def create_stripe_checkout(StripeCheckoutSession: StripeCheckoutSession):
                     "price_data": {
                         "currency": "usd",
                         "product_data": {
-                            "name": "Token",
+                            "name": "Plate",
                         },
                         "unit_amount": quantity * 10,
                     },
@@ -166,4 +187,5 @@ async def update_user_coin_count(user_id: str, quantity: int):
         user_ref.update({'coin_count': new_coin_count})
     else:
         raise HTTPException(status_code=404, detail='User not found')
+
 
