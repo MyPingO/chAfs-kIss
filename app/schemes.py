@@ -24,10 +24,7 @@ class FollowUpQuery(BaseModel):
     )
     
 class Login(BaseModel):
-    token: str = Field(
-        ...,
-        example="1234567890",
-    )
+    token: str = Field()
     
 class StripeCheckoutSession(BaseModel):
     quantity: int = Field(

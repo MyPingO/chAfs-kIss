@@ -2,8 +2,8 @@ import os
 import stripe
 from schemes import *
 from firebase_admin import auth
-from .firebase import db, get_login_uid
 from fastapi import APIRouter, HTTPException, Request, Depends
+from .firebase import db, get_login_uid, update_user_coin_count
 from .edamam import get_recipe_nutrition, filter_nutrition_data
 from .openai_client import get_meal_response, get_recipe_for_meal
 
@@ -73,10 +73,13 @@ Returns:
 """
 
 @router.post("/generate_recipe_report")
-async def generate_recipe_report(recipe_query: RecipeQuery) -> dict:
+async def generate_recipe_report(recipe_query: RecipeQuery, uid: str = Depends(get_login_uid)) -> dict:
     meal = recipe_query.meal
     # Check if meal is in unused_meals in db
-
+    doc = db.collection('users').document(uid).get()
+    unused_meals = doc.to_dict().get('unused_meals', [])
+    if meal not in unused_meals:
+        raise HTTPException(status_code=400, detail="Invalid recipe generation request. Please generate a meal first.")
     
     recipe_response = await get_recipe_for_meal(
         meal=meal,
@@ -104,15 +107,17 @@ async def login(login: Login):
         doc = user_ref.get()
         # Add user to Firestore if they don't exist
         if not doc.exists:
-            user_ref.set({'coin_count': 0})
-            user_ref.set({'unused_meals': []}) # list of strings
+            user_ref.set({'coin_count': 0, 'unused_meals': []})
         return {"status": "success"}
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) #NOTE: return the uid too?
     
 
 @router.post("/create-stripe-checkout")
-async def create_stripe_checkout(StripeCheckoutSession: StripeCheckoutSession):
+async def create_stripe_checkout(StripeCheckoutSession: StripeCheckoutSession, uid: str = Depends(get_login_uid)):
+    if not uid:
+        raise HTTPException(status_code=401, detail='Access Denied: Unauthorized')
+    
     quantity = StripeCheckoutSession.quantity
     user_id = StripeCheckoutSession.user_id
     try:
@@ -177,15 +182,6 @@ async def stripe_webhook(request: Request):
 
     return {"status": "success"}
 
-async def update_user_coin_count(user_id: str, quantity: int):
-    user_ref = db.collection('users').document(user_id)
-    doc = user_ref.get()
-    
-    if doc.exists:
-        current_coins = doc.to_dict().get('coin_count', 0)
-        new_coin_count = current_coins + quantity
-        user_ref.update({'coin_count': new_coin_count})
-    else:
-        raise HTTPException(status_code=404, detail='User not found')
+
 
 

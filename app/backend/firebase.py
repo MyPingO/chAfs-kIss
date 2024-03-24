@@ -29,7 +29,7 @@ Raises:
 def get_login_uid(request: Request) -> str:
     token = request.headers.get('Authorization')
     if not token:
-        raise HTTPException(status_code=401, detail='Unauthorized')
+        raise HTTPException(status_code=401, detail='Access Denied: Unauthorized')
     
     try:
         decoded_token = auth.verify_id_token(token)
@@ -37,3 +37,14 @@ def get_login_uid(request: Request) -> str:
             return decoded_token['uid']
     except Exception as e:
         raise HTTPException(status_code=400, detail='Error verifying user token: {}'.format(e))
+    
+async def update_user_coin_count(user_id: str, quantity: int):
+    user_ref = db.collection('users').document(user_id)
+    doc = user_ref.get()
+
+    if doc.exists:
+        current_coins = doc.to_dict().get('coin_count', 0)
+        new_coin_count = current_coins + quantity
+        user_ref.update({'coin_count': new_coin_count})
+    else:
+        raise HTTPException(status_code=404, detail='User not found')
