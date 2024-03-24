@@ -10,7 +10,9 @@ firebase_admin.initialize_app(credentials)
 db = firestore.client()
 
 """
-Checks if a user is logged in by verifying their firebase token
+Checks if a user is logged in by verifying their firebase token.
+If the user is logged in, returns the user's id.
+Otherwise, raises an HTTPException, blocking access to a route if used as a dependency.
 
 Parameters:
     Request:
@@ -35,6 +37,8 @@ def get_login_uid(request: Request) -> str:
         decoded_token = auth.verify_id_token(token)
         if decoded_token:
             return decoded_token['uid']
+        else :
+            raise HTTPException(status_code=401, detail='Access Denied: Unable to decode user token')
     except Exception as e:
         raise HTTPException(status_code=400, detail='Error verifying user token: {}'.format(e))
     

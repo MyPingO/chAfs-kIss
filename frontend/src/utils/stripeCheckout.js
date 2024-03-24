@@ -1,5 +1,3 @@
-import { auth } from "./firebaseInit";
-
 export async function stripeCheckout(stripePromise) {
   const response = await fetch(
     `${import.meta.env.VITE_SERVER_URL}/create-stripe-checkout`,
@@ -10,7 +8,6 @@ export async function stripeCheckout(stripePromise) {
       },
       body: JSON.stringify({
         quantity: 5,
-        user_id: auth.currentUser.uid,
       }),
     },
   );

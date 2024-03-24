@@ -2,6 +2,7 @@ import os
 import stripe
 from schemes import *
 from firebase_admin import auth
+from  google.cloud.firestore import ArrayRemove
 from fastapi import APIRouter, HTTPException, Request, Depends
 from .firebase import db, get_login_uid, update_user_coin_count
 from .edamam import get_recipe_nutrition, filter_nutrition_data
@@ -77,23 +78,34 @@ async def generate_recipe_report(recipe_query: RecipeQuery, uid: str = Depends(g
     meal = recipe_query.meal
     # Check if meal is in unused_meals in db
     doc = db.collection('users').document(uid).get()
-    unused_meals = doc.to_dict().get('unused_meals', [])
+    unused_meals: list[str] = doc.to_dict().get('unused_meals', [])
     if meal not in unused_meals:
         raise HTTPException(status_code=400, detail="Invalid recipe generation request. Please generate a meal first.")
     
-    recipe_response = await get_recipe_for_meal(
-        meal=meal,
-        restrictions=recipe_query.restrictions,
-    )
+    try:
+        recipe_response = await get_recipe_for_meal(
+            meal=meal,
+            restrictions=recipe_query.restrictions,
+        )
+        # Subtract 1 from coin count and remove meal from unused_meals in Firestore
+        coin_count = doc.to_dict().get('coin_count', 0)
+        db.collection('users').document(uid).update({
+            'coin_count': coin_count - 1,
+            'unused_meals': ArrayRemove([meal])
+        })
+
+    except Exception as e:
+        print(f"HTTPException: {str(e)}")
+        recipe_response = f"Error generating recipe, please contact support.\n Error: {str(e)}"
     try:
         recipe_nutrition = await get_recipe_nutrition(
             ingredients=recipe_response["ingredients"],
         )
         recipe_nutrition = filter_nutrition_data(recipe_nutrition)
 
-    except HTTPException as e:
-        print(f"HTTPException: {e.detail}")
-        recipe_nutrition = None
+    except Exception as e:
+        print(f"HTTPException: {str(e)}")
+        recipe_nutrition = f"Error fetching nutrition data: {str(e)}"
 
     return {"recipe": recipe_response, "nutrition": recipe_nutrition}
 
@@ -110,16 +122,12 @@ async def login(login: Login):
             user_ref.set({'coin_count': 0, 'unused_meals': []})
         return {"status": "success"}
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e)) #NOTE: return the uid too?
+        raise HTTPException(status_code=400, detail=str(e))
     
 
 @router.post("/create-stripe-checkout")
-async def create_stripe_checkout(StripeCheckoutSession: StripeCheckoutSession, uid: str = Depends(get_login_uid)):
-    if not uid:
-        raise HTTPException(status_code=401, detail='Access Denied: Unauthorized')
-    
-    quantity = StripeCheckoutSession.quantity
-    user_id = StripeCheckoutSession.user_id
+async def create_stripe_checkout(StripeCheckoutScheme: StripeScheme, uid: str = Depends(get_login_uid)):
+    quantity = StripeCheckoutScheme.quantity
     try:
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=["card"],
@@ -136,7 +144,7 @@ async def create_stripe_checkout(StripeCheckoutSession: StripeCheckoutSession, u
                 },
             ],
             metadata={
-                "user_id": user_id,
+                "user_id": uid,
                 "quantity": quantity,
             },
             mode="payment",
@@ -161,7 +169,7 @@ async def stripe_webhook(request: Request):
     except ValueError as e:
         # Invalid payload
         raise HTTPException(status_code=400, detail='Invalid payload')
-    except stripe.error.SignatureVerificationError as e:
+    except stripe.SignatureVerificationError as e:
         # Invalid signature
         raise HTTPException(status_code=400, detail='Invalid signature')
 
