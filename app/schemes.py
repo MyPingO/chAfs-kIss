@@ -1,5 +1,5 @@
+from typing import List, Dict, Union
 from pydantic import BaseModel, Field
-
 
 class MealQuery(BaseModel):
     query: str = Field(
@@ -8,6 +8,8 @@ class MealQuery(BaseModel):
     )
     restrictions: list[str] = Field(list[str], example=["peanuts", "Halal", "dairy"])
 
+class MealResponse(BaseModel):
+    response: list[str]
 
 class RecipeQuery(BaseModel):
     meal: str = Field(
@@ -15,7 +17,26 @@ class RecipeQuery(BaseModel):
         example="Pizza",
     )
     restrictions: list[str] = Field(list[str], example=["White Flour"])
+    
+class Recipe(BaseModel):
+    ingredients: list[str]
+    instructions: list[str]
 
+class Nutrition(BaseModel):
+    healthLabels: list[str]
+    nutrients: dict[str, dict[str, Union[str, float, int]]]
+    dailyValue: dict[str, dict[str, Union[str, float, int]]]
+    cuisineType: list[str]
+    mealType: list[str]
+    dishType: list[str]
+    dietLabels: list[str]
+    PROCNT_KCAL: dict[str, Union[str, float, int]]
+    FAT_KCAL: dict[str, Union[str, float, int]]
+    CHOCDF_KCAL: dict[str, Union[str, float, int]]
+
+class RecipeReport(BaseModel):
+    recipe: Recipe
+    nutrition: Nutrition
 
 class FollowUpQuery(BaseModel):
     query: str = Field(

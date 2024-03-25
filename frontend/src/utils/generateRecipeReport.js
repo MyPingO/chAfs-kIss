@@ -18,7 +18,7 @@ async function generateRecipeReport(index, mealName, restrictions, recipes) {
     }),
   });
 
-  console.log(data);
+  console.log(await data.json());
 }
 
 export { generateRecipeReport };
