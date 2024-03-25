@@ -8,6 +8,7 @@ import InfoCards from "./InfoCards";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../utils/firebaseInit";
 import { getUnusedMeals } from "../../utils/firebase/getUnusedMeals";
+import { generateRecipeReport } from "../../utils/generateRecipeReport";
 
 function Home() {
   const [inputView, setInputView] = useState(true); // by default true
@@ -61,6 +62,12 @@ function Home() {
     );
   } else {
     // have a func here to call to db to setRecipes
+    generateRecipeReport(
+      recipeIndex,
+      responses[recipeIndex],
+      badInputs,
+      recipes,
+    );
     return (
       <div className="flex flex-col ml-2 mr-2 h-5/6 justify-between md:justify-evenly md:flex-row">
         <div className="w-full mb-2 mr-2 h-full md:w-1/3 join join-vertical">
