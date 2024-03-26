@@ -8,7 +8,7 @@ export default function Login() {
         const user = result.user;
         user.getIdToken().then(token => {
           const server_url = import.meta.env.VITE_SERVER_URL;
-          fetch(`${server_url}/login`, {
+          fetch(`${server_url}/add_user_to_firestore`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

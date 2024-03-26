@@ -122,9 +122,9 @@ async def generate_recipe_report(recipe_query: RecipeQuery, uid: str = Depends(g
     nutrition = Nutrition(**recipe_nutrition)
     return RecipeReport(recipe=recipe, nutrition=nutrition)
 
-@router.post("/login")
-async def login(login: Login):
-    token = login.token
+@router.post("/add_user_to_firestore")
+async def add_user_to_firestore(user: UserInfo):
+    token = user.token
     try:
         decoded_token = auth.verify_id_token(token)
         user_id = decoded_token['uid']

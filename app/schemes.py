@@ -44,7 +44,7 @@ class FollowUpQuery(BaseModel):
         example="What's a good side dish to complement this meal?",
     )
     
-class Login(BaseModel):
+class UserInfo(BaseModel):
     token: str = Field()
     
 class StripeScheme(BaseModel):
@@ -52,12 +52,6 @@ class StripeScheme(BaseModel):
         ...,
         example=10,
     )
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
 
 class UserCreate(BaseModel):
     username: str
