@@ -1,6 +1,7 @@
 import os
 import firebase_admin
-from fastapi import HTTPException, Request
+from fastapi.security.api_key import APIKeyHeader
+from fastapi import HTTPException, Request, Security
 from firebase_admin import credentials, firestore, auth
 
 firebase_credentials_path = os.environ.get("FIREBASE_CREDENTIALS_PATH")
@@ -8,6 +9,8 @@ credentials = credentials.Certificate(firebase_credentials_path)
 firebase_admin.initialize_app(credentials)
 
 db = firestore.client()
+
+api_key_header = APIKeyHeader(name="Authorization")
 
 """
 Checks if a user is logged in by verifying their firebase token.
@@ -28,8 +31,7 @@ Raises:
     400: Error verifying user token
 """
 
-def get_login_uid(request: Request) -> str:
-    token = request.headers.get('Authorization')
+def get_login_uid(token: str = Security(api_key_header)) -> str:
     if not token:
         raise HTTPException(status_code=401, detail='Access Denied: Unauthorized')
     
